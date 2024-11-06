@@ -531,7 +531,16 @@ public class CacheControllerImpl implements CacheController {
             // if package phase presence means new artifacts were packaged
             if (project.hasLifecyclePhase("package")) {
                 if (projectArtifact.getFile() != null) {
-                    localCache.saveArtifactFile(cacheResult, projectArtifact);
+                    boolean storeArtifact =
+                            isOutputArtifact(projectArtifact.getFile().getName());
+                    if (storeArtifact) {
+                        localCache.saveArtifactFile(cacheResult, projectArtifact);
+                    } else {
+                        LOGGER.info(
+                                "Skipping project artifact '{}' = "
+                                        + " it is marked for exclusion from caching",
+                                projectArtifact.getFile().getName());
+                    }
                 }
                 for (org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts) {
                     if (attachedArtifact.getFile() != null) {
